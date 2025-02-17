@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Patient extends Model
-{
-    protected $guarded = [];
-    
+{    
     public function owner(): BelongsTo
     {
         return $this->belongsTo(Owner::class);
