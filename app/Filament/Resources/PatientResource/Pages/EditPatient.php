@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PatientResource\Pages;
 
 use App\Filament\Resources\PatientResource;
 use Filament\Actions;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPatient extends EditRecord
@@ -15,5 +16,10 @@ class EditPatient extends EditRecord
         return [
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getFormSchema(): array
+    {
+        return PatientResource::form(Form::make($this))->getSchema();
     }
 }

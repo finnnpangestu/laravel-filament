@@ -1,26 +1,31 @@
 <?php
 
-namespace App\Filament\Resources\PatientResource\RelationManagers;
+namespace App\Filament\Resources;
 
-use App\Filament\Resources\TreatmentResource;
+use App\Filament\Resources\TreatmentResource\Pages;
+use App\Filament\Resources\TreatmentResource\RelationManagers;
+use App\Models\Treatment;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class TreatmentsRelationManager extends RelationManager
+class TreatmentResource extends Resource
 {
-    protected static string $relationship = 'treatments';
+    protected static ?string $model = Treatment::class;
 
-    public function form(Form $form): Form
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('patient_id')
-                    ->relationship('patient', 'name')
-                    ->required()
-                    ->hiddenOn('edit'),
+                    ->relationship('patient', 'name') 
+                    ->required(),
                 Forms\Components\TextInput::make('description')
                     ->required()
                     ->maxLength(255)
@@ -35,10 +40,9 @@ class TreatmentsRelationManager extends RelationManager
             ]);
     }
 
-    public function table(Table $table): Table
+    public static function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('description')
             ->columns([
                 Tables\Columns\TextColumn::make('description'),
                 Tables\Columns\TextColumn::make('price')
@@ -50,18 +54,30 @@ class TreatmentsRelationManager extends RelationManager
             ->filters([
                 //
             ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make()
-                    ->url(TreatmentResource::getUrl('create'))
-            ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    // ->url(fn ($record) => TreatmentResource::getUrl("{$record->getKey()}/edit")),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),    
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListTreatments::route('/'),
+            'create' => Pages\CreateTreatment::route('/create'),
+            'edit' => Pages\EditTreatment::route('/{record}/edit'),
+        ];
     }
 }

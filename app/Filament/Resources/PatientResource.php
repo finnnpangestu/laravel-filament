@@ -3,20 +3,18 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PatientResource\Pages;
-use App\Filament\Resources\PatientResource\RelationManagers;
+use App\Filament\Resources\PatientResource\RelationManagers\AppointmentsRelationManager;
+use App\Filament\Resources\PatientResource\RelationManagers\TreatmentsRelationManager;
 use App\Models\Patient;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PatientResource extends Resource
 {
     protected static ?string $model = Patient::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -26,6 +24,7 @@ class PatientResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                
                 Forms\Components\Select::make('type')
                     ->options([
                         'cat' => 'Cat',
@@ -33,9 +32,11 @@ class PatientResource extends Resource
                         'rabbit' => 'Rabbit',
                     ])
                     ->required(),
+                
                 Forms\Components\DatePicker::make('date_of_birth')
                     ->required()
                     ->maxDate(now()),
+                
                 Forms\Components\Select::make('owner_id')
                     ->relationship('owner', 'name')
                     ->searchable()
@@ -55,7 +56,6 @@ class PatientResource extends Resource
                             ->tel()
                             ->required(),
                     ]),
-                
             ]);
     }
 
@@ -65,9 +65,12 @@ class PatientResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                
                 Tables\Columns\TextColumn::make('type'),
+                
                 Tables\Columns\TextColumn::make('date_of_birth')
                     ->sortable(),
+                
                 Tables\Columns\TextColumn::make('owner.name')
                     ->searchable(),
             ])
@@ -81,7 +84,6 @@ class PatientResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -93,7 +95,8 @@ class PatientResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\TreatmentsRelationManager::class,
+            TreatmentsRelationManager::class,
+            AppointmentsRelationManager::class,
         ];
     }
 
